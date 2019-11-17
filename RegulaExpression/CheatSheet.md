@@ -51,3 +51,24 @@ h|e|l|l|o! h|o|w a|r|e y|o|u?
 |(x)|**Capturing group**: x에 대응하고 이를 기억함|
 |(?:x)|**Non-capturing group**: x에 대응하고 이를 기억하지 않음|
 |(?\<a\>x)|**Named capturing group**: x에 대응하고 이를 a라는 그룹에 기억함
+
+# Quantifiers
+|Characters|Meaning|
+|--|--|
+|x*|x가 0개 이상인 것|
+|x+|x가 1개 이상인 것 = {1,}| 
+|x?|x가 0 또는 1개인 것(없거나 있을 수도 있다)|
+|x{n}|x가 n개인 것|
+|x{n,}|x가 n개 이상인 것|
+|x{n,m}|x가 n개 이상, m개 이하인 것|
+|x*?<br/>x+?<br/>x??<br/>x{n}?<br/>x{n,}?<br/>x{n,m}?|수량자는 기본적으로 **greedy**하나 뒤에 ?가 붙으면 **non-greedy**한다.<br/><br/>**greedy**: 찾을 수 있을만큼 찾음.<br/>**non-greedy**: 한번 찾으면 멈춤.
+
+# Regular expression flags
+|Flag|Description|
+|--|--|
+|g|전역 검색|
+|i|대소문자 구분 없이 검색|
+|m|multi-line 검색|
+|s|. 에 개행 문자도 매칭|
+|u|패턴을 유니코드 코드 포인트의 나열로 취급|
+|y|**sticky**검색 수행. 문자열의 현재 위치부터 검색|
