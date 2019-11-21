@@ -134,6 +134,30 @@ Optional<String> result = givenList.stream()
 - 제공된 **Comparator** 인스턴스에 따라 Stream 요소 중 가장 큰/작은 값을 반환한다. 
 - 반환값은 **Optional** 인스턴스이다.
 
+### **3.12.  _Collectors.groupingBy()_**
+```java
+Map<Integer, Set<String>> result = givenList.stream()
+	.collect(Collectors.groupingBy(String::length, Collectors.toSet()));
+```
+- **groupingBy** 메서드의 첫번째 인자를 키로 콜렉션을 Grouping하고 Map객체로 저장한다.
+- **groupingBy** 메서드의 두번째 인자의 _Downstream Collector_ 로 원하는 결과로 Grouping 할 수 있다. (toSet, toList, maxBy, counting, summingInt 등...)
+```java
+assertThat(result)
+	.containsEntry(1, newHashSet("a"))
+	.containsEntry(2, newHashSet("bb", "dd"))
+	.containsEntry(3, newHashSet("ccc"));
+```
+
+### **3.13.  _Collectors.partitioningBy()_**
+```java
+Map<Boolean, List<String>> result = givenList.stream()
+	.collect(Collectors.partitioningBy(s -> s.length() > 2));
+```
+```java
+{false=["a", "bb", "dd"], true=["ccc"]}
+```
+- Grouping 방식 중 하나로 _Boolean_ 타입을 키로 하여 두 개의 그룹으로 분류할 때 사용한다.
+
 
 
 ## **Reference**
