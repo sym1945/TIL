@@ -113,7 +113,182 @@ String name = opt.get();
 - **get()** Optional 의 value를 반환한다.
 - Optional의 value가 null일때 **get()** 을 호출하면 **NoSuchElementException**이 발생한다.
 
+## 10. Conditional Return with  _filter()_
+```java
+@Test
+public void whenOptionalFilterWorks_thenCorrect() {
+    Integer year = 2016;
+    Optional<Integer> yearOptional = Optional.of(year);
+    boolean is2016 = yearOptional.filter(y -> y == 2016).isPresent();
+    assertTrue(is2016);
+    boolean is2017 = yearOptional.filter(y -> y == 2017).isPresent();
+    assertFalse(is2017);
+}
+```
+- Optional value가 **filter**의 조건을 만족하면 해당 값을 담은 Optional을 리턴하고, 조건을 만족하지 않으면 _null_ 을 담은 Optional을 리턴한다.
+- **filter**를 기반으로 값을 _거부_ 하거나 _수락_ 할 수 있다.
+- **filter**를 이용하면 null 체크 및 조건 체크를 좀 더 우아하게 할 수 있다.
+```java
+public class Modem {
+    private Double price;
+ 
+    public Modem(Double price) {
+        this.price = price;
+    }
+    // standard getters and setters
+}
+```
+위와 같은 Modem class가 있고 Range를 체크하는 method가 아래와 같이 있다면
+```java
+public boolean priceIsInRange1(Modem modem) {
+    boolean isInRange = false;
+ 
+    if (modem != null && modem.getPrice() != null
+      && (modem.getPrice() >= 10
+        && modem.getPrice() <= 15)) {
+ 
+        isInRange = true;
+    }
+    return isInRange;
+}
+```
+Optional을 사용하면 아래와 같이 심플하게 작성 가능하다
+```java
+public boolean priceIsInRange2(Modem modem2) {
+     return Optional.ofNullable(modem2)
+       .map(Modem::getPrice)
+       .filter(p -> p >= 10)
+       .filter(p -> p <= 15)
+       .isPresent();
+ }
+```
 
+## 11. Transforming Value with  _map()_
+```java
+@Test
+public void givenOptional_whenMapWorksWithFilter_thenCorrect() {
+    String password = " password ";
+    Optional<String> passOpt = Optional.of(password);
+    boolean correctPassword = passOpt.filter(
+      pass -> pass.equals("password")).isPresent();
+    assertFalse(correctPassword);
+ 
+    correctPassword = passOpt
+      .map(String::trim)
+      .filter(pass -> pass.equals("password"))
+      .isPresent();
+    assertTrue(correctPassword);
+}
+```
+- **map**은 Optional value를 변화시키고 이를 담은 Optional을 리턴한다.
+- 위 예제와 같이 **filter**와 조합하여 사용하면 효과적이다.
+
+## 12. Transforming Value with  _flatMap()_
+- **map**과 마찬가지로 값을 변화시킨다.
+- **map**과의 차이점은 **map**은 변환되는 _value_ 를 Optional로 래핑하여 리턴하는 반면, **flatMap**은 변환된 _value가 래핑된 Optional_ 이 필요하며 최종적으로 value를 Optional로 래핑하여 리턴한다.
+- 요약하면 **map**은 value를 받아다가 Optional\<value\>를 리턴하고, **flatMap**은 Optional\<value\>를 받아다가 Optional\<value\>로 리턴한다.
+```java
+public class Person {
+    private String name;
+    private int age;
+    private String password;
+ 
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
+    }
+ 
+    public Optional<Integer> getAge() {
+        return Optional.ofNullable(age);
+    }
+ 
+    public Optional<String> getPassword() {
+        return Optional.ofNullable(password);
+    }
+ 
+    // normal constructors and setters
+}
+```
+```java
+Person person = new Person("john", 26);
+Optional<Person> personOptional = Optional.of(person);
+```
+- 위와 같이 Optional을 property로 갖는 **Person** 클래스가 있고 이 객체를 Optional로 래핑했다.
+- Optional 래핑 중첩으로 인해 _name_ 을 검사하는 테스트 method를 만든다고 하면 **map**만 사용할 시 굉장히 복잡해진다.
+```java
+@Test
+public void givenOptional_whenMapWorks_thenCorrect() {
+    Person person = new Person("john", 26);
+    Optional<Person> personOptional = Optional.of(person);
+ 
+    Optional<Optional<String>> nameOptionalWrapper  
+      = personOptional.map(Person::getName); 
+      // Person::getName의 value는 Optional<String>으로 이를 Optional로 래핑하여 반환한다. (Optional 중첩)
+    Optional<String> nameOptional  
+      = nameOptionalWrapper.orElseThrow(IllegalArgumentException::new);
+    String name1 = nameOptional.orElse(""); // 중첩된 Optional에서 실제 value만 갖고오기 무지 까다롭다.
+    assertEquals("john", name1);
+}
+```
+**flatMap**을 사용하면 아래와 같이 가능하다.
+```java
+@Test
+public void givenOptional_whenFlatMapWorks_thenCorrect() {
+	Person person = new Person("john", 26);
+    Optional<Person> personOptional = Optional.of(person);
+    
+    String name = personOptional
+      .flatMap(Person::getName) // Person::getName은 Optional<String>으로 이를 그대로 리턴함.
+      .orElse("");
+    assertEquals("john", name);
+}
+```
+
+## 13. Misusage of Optionals
+```java
+public List<Person> search(List<Person> people, String name, Optional<Integer> age) {
+    // Null checks for people and name
+    people.stream()
+      .filter(p -> p.getName().equals(name))
+      .filter(p -> p.getAge() >= age.orElse(0))
+      .collect(Collectors.toList());
+}
+```
+위와같이 **Optional**을 매개변수로 사용하는 것은 **지양**해야 한다.
+```java
+someObject.search(people, "Peter", null);
+```
+위와 같이 호출할 경우 _NullPointerException_ 이 발생하며 이는 **Optional**의 본래 목적에 어긋나기 때문이다. (null에서 자유로워지고 싶었는데 Optional 자체를 null체크하라고?)
+
+코드가 길어져도 아래처럼 평범한 **Integer** 매개변수로 받아서 한번만 null 체크를 하던가, method를 오버로드 해서 사용하는게 더 옳다고 한다.
+```java
+public List<Person> search(List<Person> people, String name, Integer age) {
+    // Null checks for people and name
+ 
+    age = age != null ? age : 0;
+    people.stream()
+      .filter(p -> p.getName().equals(name))
+      .filter(p -> p.getAge() >= age)      
+      .collect(Collectors.toList());
+}
+```
+```java
+public List<Person> search(List<Person> people, String name) {
+    return doSearch(people, name, 0);
+}
+ 
+public List<Person> search(List<Person> people, String name, int age) {
+    return doSearch(people, name, age);
+}
+ 
+private List<Person> doSearch(List<Person> people, String name, int age) {
+    // Null checks for people and name
+    return people.stream()
+      .filter(p -> p.getName().equals(name))
+      .filter(p -> p.getAge() >= age)
+      .collect(Collectors.toList());
+}
+```
+**Option**을 매개변수로 사용하는 건 [code inpector들도 권장하지 않는다고 한다.](https://rules.sonarsource.com/java/RSPEC-3553)
 
 ## Reference
 [Guide To Java 8 Optional | Baeldung](https://www.baeldung.com/java-optional)<br/>
