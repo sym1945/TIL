@@ -25,5 +25,11 @@
 
 > ```0``` 이상의 ```tabindex```는 숫자가 작을수록 우선순위가 높다.
 
+
+# Enable Focusable
+반대로 ```tabindex```를 ```0``` 이상으로 설정하면 위에 정의되지 않은 element들도 모두 focus를 가질 수 있다.
+
+> ```object```나 ```area``` 같이 조건이 필요한 element는 예외
+
 # Reference
 [:focusable Selector | jQuery UI API Documentation](https://api.jqueryui.com/focusable-selector/)
