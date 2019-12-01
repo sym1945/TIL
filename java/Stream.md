@@ -94,6 +94,102 @@ Stream<String> streamWithCharset =
 - Java NIO **Files** 클래스의 **line()** 메서드는 텍스트 파일의 String stream을 생성한다.
 - 텍스트의 각 line은 stream의 각 요소가 된다.
 
+## 3. Referencing a Stream
+```java
+Stream<String> stream = 
+	Stream.of("a", "b", "c").filter(element -> element.contains("b"));
+	
+Optional<String> anyElement = stream.findAny();
+```
+- Stream 생성 후 터미널 작업을 통해 엑세스 가능한 참조를 가질 수 있음.
+- 이후 같은 Stream을 액세스하면 **IllegalStateException** 발생함.
+- **즉, Stream은 재사용할 수 없음.**
+- 위 코드 실행 후 아래 코드 실행하면 **IllegalStateException** 발생함
+```java
+Optional<String> firstElement = stream.findFirst();
+```
+
+## 4. Stream Pipeline
+- Stream을 통해 일련의 작업을 수행하고 결과를 집계하려면 **Source**, **intermediate operation**, **terminal operation** 이 필요함.
+- **intermediate operation**(중간 작업)은 새로 수정된 Stream을 반환함.
+- 아래는 기존 Stream에서 첫번째 요소를 제외한 Stream을 반환함.
+```java
+Stream<String> onceModifiedStream =
+	Stream.of("abcd", "bbcd", "cbcd").skip(1);
+```
+- 둘 이상의 **intermediate operation**이 필요할 경우 이를 연결할 수 있음.
+```java
+Stream<String> twiceModifiedStream =
+	stream.skip(1).map(element -> element.substring(0, 3));
+```
+- 마지막으로 결과를 집계하기 위해 **terminal operation**(터미널 작업)을 수행함.
+- 아래는 중간 작업 결과에 대한 요소의 개수를 반환하는 예제.
+```java
+List<String> list = Arrays.asList("abc1", "abc2", "abc3");
+long size = list.stream().skip(1)
+	.map(element -> element.substring(0, 3)).sorted().count();
+```
+
+## 5. Lazy Invocation
+- **intermediate operation**은 게을러서 **terminal operation**이 실행될 때 호출된다.
+```java
+private long counter;
+  
+private void wasCalled() {
+    counter++;
+}
+```
+```java
+List<String> list = Arrays.asList(“abc1”, “abc2”, “abc3”);
+counter = 0;
+Stream<String> stream = list.stream().filter(element -> {
+    wasCalled();
+    return element.contains("2");
+});
+```
+- 위 코드를 실행시키면 counter가 하나도 증가하지 않는다.
+- 이유는 **terminal operation**을 실행하지 않았기 때문.
+```java
+Optional<String> stream = list.stream().filter(element -> {
+    log.info("filter() was called");
+    return element.contains("2");
+}).map(element -> {
+    log.info("map() was called");
+    return element.toUpperCase();
+}).findFirst();
+```
+- 위 코드를 실행시키면 ```filter()```는 2번 호출되고, ```map()```은 1번 호출된다.
+- ```findFirst()```라는 **terminal operation**에 의해 ```filter()```는 조건을 만족하는 2번째 요소를 찾고 이를 새 Stream으로 반환, ```map()```은 ```filter()```가 반환한 Stream으로 작업하기 때문에 1번만 호출되는 것.
+
+## 6. Order of Execution
+- **intermediate operation**의 체인작업의 순서는 퍼포먼스 측면에서 매우 중요하다.
+```java
+long size = list.stream().map(element -> {
+    wasCalled();
+    return element.substring(0, 3);
+}).skip(2).count();
+```
+- 위 코드를 실행시키면 ```wasCalled()```가 3번 호출된다.
+- 그 후 ```skip(2)```에 의해 최종적으로 반환되는 값은 1개이다.
+- 1개를 찾기 위해 ```map()```을 3번 호출하는 것은 굉장히 비효율적이다.
+
+```java
+long size = list.stream().skip(2).map(element -> {
+    wasCalled();
+    return element.substring(0, 3);
+}).count();
+```
+- 따라서 위와같이 먼저 ```skip()```하여 Stream의 크기를 줄이고 ```map()```작업을 이어나가는 것이 효율적이다.
+- 즉, Stream의 크기를 줄이는 ```skip()```, ```filter()```, ```distinct()``` 같은 작업을 체인의 가장 앞 부분에 배치하는게 좋다.
+
+## 7. Stream Reduction
+### 7.1 The reduce() Method
+### 7.2 The collect() Method
+- [**Collector.md** 정리 참조](https://github.com/sym1945/TIL/blob/master/java/Collectors.md)
+## 8. Parallel Streams
+
+
+
 ## Reference
 https://www.baeldung.com/java-8-streams</br>
 https://futurecreator.github.io/2018/08/26/java-8-streams/
