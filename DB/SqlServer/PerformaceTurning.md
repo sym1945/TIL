@@ -88,6 +88,7 @@
   * Page header : 96 byte
   * Rows of data : 8060 bytes per page
   * Row offset : 36 bytes
+  
 ## Page의 용도와 중요한 이유
 - 페이지의 8192바이트 중 약 8060바이트가 데이터 행을 삽입할 수 있음. 한 페이지에 들어갈 수 있는 데이터 행을 설계하면 스토리지 사용률이 훨씬 낮아짐.(스토리지 사용 및 페이지 검색 감소로 성능 향상 가능)
   * ex: 행 길이가 4200바이트인 경우 한 페이지에 하나의 행만 저장됨(그리고 나머지 페이지 3860바이트는 낭비되는 공간임). 행 크기를 4000바이트로 재설계할 경우, 한 페이지에 두 개의 행을 저장할 수 있으므로 낭비되는 공간의 오버헤드를 크게 줄일 수 있음.
@@ -101,3 +102,36 @@
 |...|... |...|
 |10       |IAM Page  |페이지 정보, 메모리 정보를 제한.|
 |...|... |...|
+
+## Page split
+한 페이지 당 추가, 갱신 가능한 8060바이트의 데이터 공간이 있음. 데이터를 많이 삽입하면 해당 데이터 페이지에서 새로 삽입한 행을 저장할 공간이 부족할 수 있음. 이 경우 SQL 서버는 현재 데이터 페이지의 일부 데이터를 새 데이터 페이지로 이동시킴. 여기에는 행을 삽입하는 일반적인 I/O가 포함되지만 적용 가능한 인덱스를 업데이트하는 것도 포함됨. 이로 인해 과도한 I/O가 발생. 일정량의 페이지 분할은 정상이고 예상되지만 페이지 분할이 너무 많으면 성능 문제가 발생할 수 있음.
+
+> SQL Server에서 Page 분할 상태 확인하기
+```
+--viewing the actual data in a page that belong to either data page or an index page using DBCC IND command
+
+-- this flag must be turned on
+
+DBCC traceon(3604)
+GO
+
+--the following DBCC command wil give all the index info as we have selected -1 option
+--when we execute the command below, we see that two pages have been alloacted; one for the IAM and one for data page
+--pagetype 10 = IAM  pagetype 1 = data page  2 = index page
+
+DBCC IND ('pages', cars, -1)
+GO 
+
+-- To get a more detailed content of the actual data in the data page we use the following DBCC command:
+
+-- this flag must be turned on
+
+DBCC traceon(3604)
+GO
+
+--we can actually see the 3 sections of the data page:  header, row content, and row offset
+
+DBCC page('pages',1,304,1) --<< option 1
+
+DBCC page('pages',1,304,3) --<< option 3
+```
