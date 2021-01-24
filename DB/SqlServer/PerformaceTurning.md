@@ -139,3 +139,25 @@ DBCC page('pages',1,304,3) --<< option 3
 # SQL Optimizer
 - Sql Optimizer(쿼리 최적화 도구)는 가장 효율적인 실행 계획을 쿼리하고 결정하는 SQL Server 엔진의 일부.
 - 액세스한 데이터에 대해 수집된 통계를 기반으로 각 SQL 문을 최적화하여 이러한 작업을 수행. 이후 쿼리 최적화 프로그램은 SQL 문을 실행하는 가장 효율적인 방법을 선택.
+
+# Operator
+
+Types of Operators: https://technet.microsoft.com/en-us/library/ms175913(v=sql.105).aspx
+- Table Scan  
+- Clustered Index Scan 
+- Clustered Index Seek  
+- Non-clustered Index Seek  
+- Compute Scalar  
+- Adding a WHERE Clause
+- Filter
+- Sort  
+- Table Joins :
+  * Nested Loops Join   
+  * Hash Match   (Join)  
+  * Merge Join  
+- Key LookUp   
+- RID LookUp  
+- DML statements:
+  * Insert  
+  * Delete
+  * Update
