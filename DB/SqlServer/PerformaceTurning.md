@@ -75,6 +75,19 @@
 - 데이터베이스 인덱스는 책 끝에 있는 인덱스와 매우 유사함.
 - 데이터베이스 인덱스는 자체 공간을 차지하고 중복성이 매우 높으며, 다른 장소에 저장된 실제 정보를 나타냄.
 
+## Clusted index 생성시 고려할 점
+- 클러스터된 인덱스는 데이터를 하나의 클러스터된 인덱스처럼 키 값에 정렬하고 저장한다.
+- 일반적으로 모든 테이블에는 열에 정의된 군집화된 인덱스가 있어야 한다.
+- 자주 사용하는 쿼리와 높은 수준의 고유성에 클러스터된 인덱스를 만든다.
+- 범위 쿼리에 클러스터된 인덱스 생성 기능을 사용할 수 있다.
+- UNIQUE 속성을 사용하여 클러스터된 인덱스 생성.
+- BETWEEN, >, >=, <, <=를 사용하여 연산자에 클러스터형 인덱스 생성.
+- 큰 결과 세트를 반환.
+- JOIN 절, ORDER BY 절 또는 GROUP BY 절 사용
+- 고유하거나 고유한 여러 값을 포함하나?
+- 순차적으로 액세스 가능하나?
+- 테이블에서 검색된 데이터를 정렬하는 데 자주 사용
+
 # B-Tree
 - 인덱스 생성시 인덱스느 인덱스 노드라고 하는 페이지 집합에 분산됨. 이 구조를 B-트리 구조라 부름.
 - 페이지는 세 가지 레벨로 분산됨. (루트 노드, 중간 노드, 리프 노드)
@@ -161,3 +174,14 @@ Types of Operators: https://technet.microsoft.com/en-us/library/ms175913(v=sql.1
   * Insert  
   * Delete
   * Update
+  
+# Execution plan
+> Tool tip property
+
+- Estimated operator cost : 운영 비용(총 비용의 %)
+- Estimated CPU cost : 작업을 완료하는 데 필요한 CPU의 양에 대한 비용
+- Estimated I/O cost : 작업을 완료하는 데 필요한 I/O의 양에 대한 비용
+- Estimated row size : 작업에 의해 실행된 각 행의 크기
+- Actual and Estimated number of rows : 작업에서 실행된 행 수
+- Actual and Estimated execution mode : 행 또는 배치에서 행이 한 번에 하나씩 처리되는지 또는 일괄 처리되는지 여부를 나타냄
+  
