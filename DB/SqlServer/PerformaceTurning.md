@@ -103,6 +103,27 @@
 - 쿼리 최적화 도구가 인덱스 내의 모든 열 값을 찾을 수 있는 경우 테이블 또는 클러스터된 인덱스 데이터에 액세스하지 않아 디스크 I/O 작업이 줄어듬.
 - 성과 이름의 조합과 같은 고유한 값에 비클러스터 인덱스 생성
 
+## Filter Non-clustered index
+- 비클러스터형 인덱스를 작성할 때 인덱스에 필요한 추가 공간을 고려해야 함.
+- 솔루션 중 하나는 SQL Server 2008에 도입된 필터링된 인덱스를 사용하는 것.
+- 비클러스터형 인덱스 생성할 때 WHERE 절을 넣기만 하면 됨.
+- 선택한 레코드만 인덱싱되어 디스크 공간 활용률이 줄어듬.
+- 필터링된 인덱스를 사용시 이점
+  * 스토리지 비용 절감: 클러스터되지 않은 인덱스에 필요한 Disk 감소
+  * 최적화된 쿼리 성능: 데이터가 적다는 것은 최적화 프로그램이 많은 통계를 사용할 필요가 없다는 것을 의미
+  * 인덱스 유지 관리 비용 절감: 인덱스 재구축 감소
+> 생성 예시
+```
+--CREATE A FILTER INDEX ON CITY
+
+USE [AdventureWorks2016CTP3]
+GO
+
+CREATE NONCLUSTERED INDEX [NonClusteredIndex-FILTER_CITY] 
+ON [Person].[AddressB]
+([City] ASC) WHERE CITY = 'Seattle'   --<< THE WAY TO CREATE A FILTER NON CLUSTERDE INDEX IS TO ADD THE WHERE CLAUSE
+```
+
 # B-Tree
 - 인덱스 생성시 인덱스느 인덱스 노드라고 하는 페이지 집합에 분산됨. 이 구조를 B-트리 구조라 부름.
 - 페이지는 세 가지 레벨로 분산됨. (루트 노드, 중간 노드, 리프 노드)
