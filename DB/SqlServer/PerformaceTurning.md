@@ -221,4 +221,11 @@ Types of Operators: https://technet.microsoft.com/en-us/library/ms175913(v=sql.1
 - Estimated row size : 작업에 의해 실행된 각 행의 크기
 - Actual and Estimated number of rows : 작업에서 실행된 행 수
 - Actual and Estimated execution mode : 행 또는 배치에서 행이 한 번에 하나씩 처리되는지 또는 일괄 처리되는지 여부를 나타냄
+
+# Sort operator
+- SORT 연산자는 연산자가 받은 모든 행을 순서대로 정렬.
+- SORT 연산자를 볼 때 메모리 및 디스크 비용이 많이 들고 성능 문제가 발생할 수 있으므로 실행 계획에서 해당 연산자를 제거하는 것이 좋음.
+
+> SORT로 인한 성능저하를 피하는 가장 쉬운 방법?
+SORT 대상 컬럼을 인덱스로 지정. 인덱스는 열별로 정렬되므로 쿼리에 커버링 인덱스를 만들 경우 쿼리 최적화 프로그램이 이 인덱스를 식별하여 SORT 작업을 방지합니다.
   
