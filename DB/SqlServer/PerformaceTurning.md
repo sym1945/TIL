@@ -368,9 +368,13 @@ DBCC FREEPROCCACHE (0x06000500304A1608D05E0EFEE701000001000000000000000000000000
 ## ACID 테스트
 
 모든 SQL Server 트렌젝션은 ACID 테스트를 통과하도록 강제 됨.
+
 **Atomic(원자성)**: 두 개 이상의 개별 정보가 포함된 트랜잭션에서 모든 정보가 커밋되거나 커밋되지 않음.
+
 **Consistency(일관성)**: 트랜잭션은 새롭고 유효한 데이터 상태를 생성하거나, 오류가 발생할 경우 트랜잭션이 시작되기 전의 상태로 모든 데이터를 반환함.
+
 **Isolation(고립성)**: 처리 중이지만 아직 커밋되지 않은 트랜잭션은 다른 트랜잭션과 격리된 상태로 남아 있어야 함.
+
 **Durability(지속성)**: 시스템이 데이터를 저장하여 장애가 발생하고 시스템이 재시작된 경우에도 데이터를 올바른 상태로 사용할 수 있도록 함.
 
 ## Locking in action
@@ -417,3 +421,17 @@ FROM sys.dm_tran_locks
 WHERE resource_type <> ‘DATABASE’
 ```
 
+# Blocking
+한 SPID(SPID 1)가 특정 리소스에 대한 잠금을 유지하고 두 번째 SPID(SPID 2)가 동일한 리소스에 대해 충돌하는 잠금 유형을 획득하려고 할 때 Blocking이 발생.
+
+> SCRIPT TO FIND OPEN TRANSACTIONS
+```
+SELECT SP.SPID,[TEXT] as SQLCode FROM SYS.SYSPROCESSES SP
+CROSS APPLY SYS.DM_EXEC_SQL_TEXT(SP.[SQL_HANDLE])AS DEST WHERE OPEN_TRAN >= 1
+```
+
+# Deadlock
+- Deadlock은 둘 이상의 트랜잭션에 리소스가 잠겨 있고 다른 세션이 잠긴 세션을 요청할 때 발생.
+- 예로 spid 1은 리소스 1에 (X)가 있고, spid 2는 리소스 2에 (X)가 있으며, 두 가지 모두 서로의 리소스에 대한 잠금을 요청함. 이 원형 체인은 Deadlock을 생성.
+- Deadlock은 대기하여 해결되지 않음.
+- 이 경우 SQL 서버는 Deadlock을 감지하고 프로세스 중 하나를 Deadlock 공격 대상으로 선언하여 프로세스를 삭제함.
