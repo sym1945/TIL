@@ -231,7 +231,8 @@ Types of Operators: https://technet.microsoft.com/en-us/library/ms175913(v=sql.1
 SORT 대상 컬럼을 인덱스로 지정. 인덱스는 열별로 정렬되므로 쿼리에 커버링 인덱스를 만들 경우 쿼리 최적화 프로그램이 이 인덱스를 식별하여 SORT 작업을 방지gka.
 
 # Join operator
-- NESTED loop join: 작은 테이블에서 사용 중인 열에 인덱스가 없지만 큰 테이블에는 인덱스가 있는 경우
+**NESTED loop join**
+작은 테이블에서 사용 중인 열에 인덱스가 없지만 큰 테이블에는 인덱스가 있는 경우
 ```
 SELECT * FROM  Sales.SalesOrderHeader AS OH
 WHERE OH.OrderDate BETWEEN '2011-07-01' AND '2011-07-14'  --<< SMALLER TABLE (144 ROWS) (OUTER TABLE) DOES NOT HAVE AN INDEX ON COLUMN ORDERDATE
@@ -246,7 +247,8 @@ Sales.SalesOrderDetail AS OD
 ON OH.SalesOrderID = OD.SalesOrderID
 WHERE (OH.OrderDate BETWEEN '2011-07-01' AND '2011-07-14')  --<< SMALLER TABLE (144 ROWS) (OUTER TABLE) DOES NOT HAVE AN INDEX ON COLUMN ORDERDATE
 ```
-- HASH join: 테이블이 정렬되지 않았거나 인덱스가 없는 경우. 일반적으로 인덱스가 없는 것을 의미.
+**HASH join**
+테이블이 정렬되지 않았거나 인덱스가 없는 경우. 일반적으로 인덱스가 없는 것을 의미.
 ```
 CREATE TABLE  TABLE1 
 (id INT identity ,EVENTS varchar(60))
@@ -298,7 +300,8 @@ INNER JOIN
 TABLE2 
 ON TABLE1.id = TABLE2.id
 ```
-- MERGE Join: Merge되는 테이블 열이 모두 정렬 되있는 경우. 속도가 빠르고 큰 테이블을 조인할 때 더 좋은 성능을 발휘함.
+**MERGE Join**M
+Merge되는 테이블 열이 모두 정렬 되있는 경우. 속도가 빠르고 큰 테이블을 조인할 때 더 좋은 성능을 발휘함.
 ```
 SELECT H.CustomerID, H.SalesOrderID, D.ProductID, D.LineTotal 
 FROM Sales.SalesOrderHeader H 
@@ -306,8 +309,40 @@ INNER JOIN Sales.SalesOrderDetail D ON H.SalesOrderID = D.SalesOrderID
 WHERE H.CustomerID > 100 
 ```
 
+# Statistics
+- 최적화 도구에게 쿼리 명령 집합이 주어지면 최적화 도구는 해당 쿼리를 실행할 수 있는 가장 좋고 효율적인 방법을 선택함. 가장 효율적인 실행 계획을 반환하기 위해 최적화 도구는 테이블과 열의 통계에 의존하여 결과를 얻음.
+- Statistics는 표 또는 인덱싱된 뷰의 하나 이상의 열에 있는 값의 분포에 대한 통계 정보를 포함하는 객체임. DBCC 커맨드로 열람 가능.
+```
+--DBCC SHOW_STATISTICS ( table_name , STATISTIC NAME ) 
 
+DBCC SHOW_STATISTICS ('[Person].[Person]',[IX_Person_LastName_FirstName_MiddleName]) --<< notice the date when it was last updated (NEEDS TO BE UPDATED)
+GO  
 
+--REBUILD INDEXES
+
+DBCC SHOW_STATISTICS ('[Person].[Person]',[IX_Person_LastName_FirstName_MiddleName]) WITH HISTOGRAM;  
+GO
+
+--Using DBCC FREEPROCCACHE to clear ALL cache
+
+DBCC FREEPROCCACHE
+
+--Using DBCC FREEPROCCACHE to clear specific execution plans from the cache
+
+DBCC FREEPROCCACHE (0x06000500304A1608D05E0EFEE701000001000000000000000000000000000000000000000000000000000000);
+```
+```
+> Statistics가 필요한 이유?
+
+- 쿼리 최적화 도구는 이러한 통계를 사용하여 쿼리 결과에 반환되는 행 수 또는 카디널리티를 추정함.
+- 쿼리 최적화 도구는 이 카디널리티 추정치를 사용하여 인덱스 스캔 연산자 대신 인덱스 검색 연산자를 선택하여 가장 효율적인 실행 계획을 반환함.
+
+> Statistics 작성 시기
+
+- PK를 사용하여 테이블을 생성할 때 SQL Server에서 통계를 자동으로 생성
+- 기존 테이블에 색인을 작성할 때
+- 인덱스를 재구성할 때 자동으로 새 통계 생성
+- 기본적으로 SQL Server에는 자동 생성 통계가 사용되도록 설정돼있음. (절대로 OFF하지 말 것)
 
 
   
