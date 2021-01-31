@@ -232,6 +232,7 @@ SORT 대상 컬럼을 인덱스로 지정. 인덱스는 열별로 정렬되므�
 
 # Join operator
 **NESTED loop join**
+
 작은 테이블에서 사용 중인 열에 인덱스가 없지만 큰 테이블에는 인덱스가 있는 경우
 ```
 SELECT * FROM  Sales.SalesOrderHeader AS OH
@@ -248,6 +249,7 @@ ON OH.SalesOrderID = OD.SalesOrderID
 WHERE (OH.OrderDate BETWEEN '2011-07-01' AND '2011-07-14')  --<< SMALLER TABLE (144 ROWS) (OUTER TABLE) DOES NOT HAVE AN INDEX ON COLUMN ORDERDATE
 ```
 **HASH join**
+
 테이블이 정렬되지 않았거나 인덱스가 없는 경우. 일반적으로 인덱스가 없는 것을 의미.
 ```
 CREATE TABLE  TABLE1 
@@ -300,7 +302,8 @@ INNER JOIN
 TABLE2 
 ON TABLE1.id = TABLE2.id
 ```
-**MERGE Join**M
+**MERGE Join**
+
 Merge되는 테이블 열이 모두 정렬 되있는 경우. 속도가 빠르고 큰 테이블을 조인할 때 더 좋은 성능을 발휘함.
 ```
 SELECT H.CustomerID, H.SalesOrderID, D.ProductID, D.LineTotal 
@@ -332,6 +335,7 @@ DBCC FREEPROCCACHE
 DBCC FREEPROCCACHE (0x06000500304A1608D05E0EFEE701000001000000000000000000000000000000000000000000000000000000);
 ```
 ```
+
 > Statistics가 필요한 이유?
 
 - 쿼리 최적화 도구는 이러한 통계를 사용하여 쿼리 결과에 반환되는 행 수 또는 카디널리티를 추정함.
