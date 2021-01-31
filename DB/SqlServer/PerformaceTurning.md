@@ -227,5 +227,87 @@ Types of Operators: https://technet.microsoft.com/en-us/library/ms175913(v=sql.1
 - SORT 연산자를 볼 때 메모리 및 디스크 비용이 많이 들고 성능 문제가 발생할 수 있으므로 실행 계획에서 해당 연산자를 제거하는 것이 좋음.
 
 > SORT로 인한 성능저하를 피하는 가장 쉬운 방법?
-SORT 대상 컬럼을 인덱스로 지정. 인덱스는 열별로 정렬되므로 쿼리에 커버링 인덱스를 만들 경우 쿼리 최적화 프로그램이 이 인덱스를 식별하여 SORT 작업을 방지합니다.
+
+SORT 대상 컬럼을 인덱스로 지정. 인덱스는 열별로 정렬되므로 쿼리에 커버링 인덱스를 만들 경우 쿼리 최적화 프로그램이 이 인덱스를 식별하여 SORT 작업을 방지gka.
+
+# Join operator
+- NESTED loop join: 작은 테이블에서 사용 중인 열에 인덱스가 없지만 큰 테이블에는 인덱스가 있는 경우
+```
+SELECT * FROM  Sales.SalesOrderHeader AS OH
+WHERE OH.OrderDate BETWEEN '2011-07-01' AND '2011-07-14'  --<< SMALLER TABLE (144 ROWS) (OUTER TABLE) DOES NOT HAVE AN INDEX ON COLUMN ORDERDATE
+
+SELECT * FROM  Sales.SalesOrderDetail  AS OD              --<< LARGER TABLE (121317 ROWS) (INNER TABLE)
+
+SELECT 
+OH.OrderDate, OD.OrderQty
+FROM  Sales.SalesOrderHeader AS OH 
+INNER JOIN
+Sales.SalesOrderDetail AS OD 
+ON OH.SalesOrderID = OD.SalesOrderID
+WHERE (OH.OrderDate BETWEEN '2011-07-01' AND '2011-07-14')  --<< SMALLER TABLE (144 ROWS) (OUTER TABLE) DOES NOT HAVE AN INDEX ON COLUMN ORDERDATE
+```
+- HASH join: 테이블이 정렬되지 않았거나 인덱스가 없는 경우. 일반적으로 인덱스가 없는 것을 의미.
+```
+CREATE TABLE  TABLE1 
+(id INT identity ,EVENTS varchar(60))
+
+--INSERT SOME DATA 
+
+declare @i int
+set @i=0
+while (@i<100)
+begin
+insert into TABLE1 (EVENTS)
+select EVENT from AdventureWorks2016CTP3.dbo.DatabaseLog
+set @i=@i+1
+end
+
+--VIEW LARGE TABLE
+
+SELECT * FROM TABLE1  --<<17900 ROWS
+
+--CREATE A SECOND TABLE
+
+CREATE TABLE  TABLE2 
+(id INT identity ,EVENTS varchar(60))
+
+--INSERT SOME DATA
+
+declare @i int
+set @i=0
+while (@i<100)
+begin
+insert into TABLE2 (EVENTS)
+select EVENT from AdventureWorks2016CTP3.dbo.DatabaseLog
+set @i=@i+1
+end
+
+--VIEW LARGE TABLE
+
+SELECT * FROM TABLE2  --<<17900 ROWS
+
+
+--EXECUTE AND VIEW HASH JOIN AS THERE IS NO INDEX
+
+SELECT TABLE1.id, TABLE1.EVENTS, 
+TABLE2.id AS Expr1, 
+TABLE2.EVENTS AS Expr2
+FROM 
+TABLE1 
+INNER JOIN
+TABLE2 
+ON TABLE1.id = TABLE2.id
+```
+- MERGE Join: Merge되는 테이블 열이 모두 정렬 되있는 경우. 속도가 빠르고 큰 테이블을 조인할 때 더 좋은 성능을 발휘함.
+```
+SELECT H.CustomerID, H.SalesOrderID, D.ProductID, D.LineTotal 
+FROM Sales.SalesOrderHeader H 
+INNER JOIN Sales.SalesOrderDetail D ON H.SalesOrderID = D.SalesOrderID 
+WHERE H.CustomerID > 100 
+```
+
+
+
+
+
   
