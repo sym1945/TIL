@@ -1,0 +1,17 @@
+## GridControl
+### GridView
+## NavigationFrame
+- API
+  - https://docs.devexpress.com/WindowsForms/DevExpress.XtraBars.Navigation.NavigationFrame?v=21.2&p=netframework
+- Events
+  - ```QueryControl```
+## OfficeNavigationBar
+- API
+  - https://docs.devexpress.com/WindowsForms/DevExpress.XtraBars.Navigation.OfficeNavigationBar?v=21.2&p=netframework
+- Properties
+  - ```ShowPeekFormOnItemHover```
+  - ```ViewMode```
+## TreeList
+## DXValidationProvider
+- Example
+  - https://docs.devexpress.com/WindowsForms/9481/controls-and-libraries/editors-and-simple-controls/examples/how-to-validate-data-via-dxvalidationprovider-component?v=21.2&p=netframework
