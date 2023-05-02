@@ -21,7 +21,7 @@
   - 늘릴 수는 있으나 줄일 수는 없음
 - 파티션 레코드 언제 삭제?
   - log.retension.ms: 최대 레코드 보관 시간
-  - log.retension.byte: 최대 레코드 보존 크
+  - log.retension.byte: 최대 레코드 보존 크기
 
 
 ## 3.브로커, 복제, ISR(In-Sync-Replication)
