@@ -34,7 +34,7 @@
   - partition: 1, replication: 3 -> 원본 파티션 1개, 복제본 파티션 2개 존재
 - 브로커 개수에 따라 replication 개수 제한됨 (브로커 3대 : replication 최대 3개)
 - 원본 파티션: Leader 파티션
-- 복제본 파티션: Follower 파티
+- 복제본 파티션: Follower 파티션
 - Leader, Follower 파티션 합쳐서 ISR 이라 부름
 - replication을 사용하는 이유
   - 파티션의 고가용성을 위해 (Leader 브로커가 죽으면 Follower 브로커가 Leader 로 변경)
