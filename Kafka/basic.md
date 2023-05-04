@@ -100,3 +100,10 @@
 - 특정 Topic으로 데이터를 publish
 - 처리 실패/재시도
 - Key를 사용하여 파티션에 데이터 넣는 중 토픽에 새로운 파티션이 추가되면 Key와 파티션의 매칭이 깨짐 (키 ↔ 파티션 일관성 보장되지 않음)
+
+
+## 9.카프카 Consumer
+
+- Topic의 Partition으로 부터 데이터 polling
+- Partition offset 위치 기록(commit)
+- Cousumer group을 통해 병렬처리
