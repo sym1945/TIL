@@ -61,3 +61,14 @@
 - Producer의 데이터 생산 속도가 Consumer의 데이터 소비 속도보다 빠른 경우 발생하는 Offset 차이 (Producer Offset ~ Consumer Offset)
 - 파티션 마다 컨슈머 랙이 존재할 수 있음
 - records-lag-max : 컨슈머 랙 중 가장 큰 값
+
+
+## 6.컨슈머 랙 모니터링 애플리케이션, 카프카 버로우(Burrow)
+
+- 컨슈머 랙을 모니터링 할 수 있는 독립된 어플리케이션
+- 카프카 버로우 특징
+  - 멀티 카프카 클러스터 지원
+  - Sliding window를 통한 Consumer의 status 확인 ('ERROR', 'WARNING', 'OK')
+  - HTTP api 제공
+
+
