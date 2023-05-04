@@ -56,3 +56,8 @@
 - 파티셔너 인터페이스를 통해 커스텀 파티셔너 작성 가능
 
 
+## 5.컨슈머 랙(Consumer Lag) 이란?
+
+- Producer의 데이터 생산 속도가 Consumer의 데이터 소비 속도보다 빠른 경우 발생하는 Offset 차이 (Producer Offset ~ Consumer Offset)
+- 파티션 마다 컨슈머 랙이 존재할 수 있음
+- records-lag-max : 컨슈머 랙 중 가장 큰 값
