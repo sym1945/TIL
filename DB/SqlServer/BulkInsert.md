@@ -6,3 +6,6 @@ https://learn.microsoft.com/en-us/sql/relational-databases/import-export/use-a-f
 
 ### Use a format file to skip a data field (SQL Server)
 https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/relational-databases/import-export/use-a-format-file-to-skip-a-data-field-sql-server.md
+
+### Use unicode character format to import or export data (SQL Server)
+https://learn.microsoft.com/en-us/sql/relational-databases/import-export/use-unicode-character-format-to-import-or-export-data-sql-server?view=sql-server-ver16
